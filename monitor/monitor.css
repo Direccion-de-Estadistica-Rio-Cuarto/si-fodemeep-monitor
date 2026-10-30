@@ -1,0 +1,1284 @@
+/* ==========================================================================
+   monitor.css — Monitor Ejecutivo del SI FoDeMEEP (monitor.html).
+
+   Va después del sistema de la plantilla y de css/tablero.css. Reusa .kpi,
+   .indicadores, .panel, .boton y la tabla de base.css; acá solo está lo que
+   el Monitor necesita y la plantilla no trae (pestañas, barras horizontales,
+   mapa, ficha lateral). Todos los colores salen de css/tokens.css.
+   ========================================================================== */
+
+.cargando {
+  display: grid;
+  place-items: center;
+  min-height: 40vh;
+  gap: 10px;
+  color: var(--texto-suave);
+  font-size: 1.05rem;
+}
+
+.cargando .icono {
+  font-size: 32px;
+}
+
+/* --- Pestañas y acciones ----------------------------------------------------- */
+.herramientas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin-bottom: 12px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  overflow-x: auto;
+}
+
+.tabs a {
+  padding: 8px 14px;
+  border-radius: calc(var(--radio) - 4px);
+  color: var(--texto);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.92rem;
+  white-space: nowrap;
+}
+
+.tabs a:hover {
+  background: var(--fondo);
+}
+
+.tabs a.activo {
+  background: var(--marca);
+  color: var(--marca-texto);
+}
+
+.herramientas-der {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.herramientas-der .boton[aria-pressed="true"] {
+  border-color: var(--marca);
+}
+
+.banda-ejemplo {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--alerta);
+  border-radius: var(--radio);
+  background: color-mix(in srgb, var(--alerta) 14%, var(--superficie));
+  color: var(--texto);
+  font-size: 0.88rem;
+}
+
+.banda-ejemplo .icono {
+  font-size: 20px;
+}
+
+/* Botón con forma de enlace (acciones dentro de un texto). */
+.link {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: var(--marca-enlace);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-align: left;
+}
+
+/* --- Filtros globales --------------------------------------------------------- */
+.filtros-globales {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.filtros-globales input {
+  flex: 1 1 260px;
+  max-width: 420px;
+}
+
+input[type=search],
+input[type=url],
+input[type=password],
+select {
+  min-height: 40px;
+  padding: 0 12px;
+}
+
+/* --- Estructura ---------------------------------------------------------------- */
+.contenido {
+  display: grid;
+  gap: 16px;
+}
+
+.contenido > .indicadores {
+  margin-bottom: 0;
+}
+
+.grilla {
+  align-items: start;
+  margin-bottom: 0;
+}
+
+.g-2 {
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+}
+
+.g-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 1000px) {
+  .g-2,
+  .g-3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.col {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.panel > header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.panel > header .nota,
+.panel header .nota {
+  margin: 0;
+}
+
+.panel h3 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.vacio {
+  color: var(--texto-suave);
+  font-size: 0.88rem;
+  margin: 6px 0;
+}
+
+.sep {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--borde);
+}
+
+/* --- Indicadores ------------------------------------------------------------------ */
+.kpi .etiqueta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.kpi .etiqueta .icono {
+  font-size: 18px;
+}
+
+.kpi .valor {
+  margin: 0;
+}
+
+.kpi .valor small {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+  margin-left: 4px;
+}
+
+.kpi-barra {
+  display: flex;
+  gap: 2px;
+  height: 8px;
+  margin-top: 8px;
+  border-radius: 4px;
+  background: var(--fondo);
+  box-shadow: inset 0 0 0 1px var(--borde);
+  overflow: hidden;
+}
+
+/* Alerta Roja activa: la tarjeta entera se pinta (máxima prioridad). */
+.kpi.alerta-roja {
+  border-color: var(--ies-roja);
+}
+
+.kpi.alerta-roja .etiqueta,
+.kpi.alerta-roja .detalle,
+.kpi.alerta-roja .valor small {
+  color: var(--ies-roja-texto);
+}
+
+/* --- Distribución y leyendas --------------------------------------------------- */
+.segmentos {
+  display: flex;
+  gap: 2px;
+  height: 26px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.seg {
+  min-width: 4px;
+}
+
+.seg.b-pendiente {
+  box-shadow: inset 0 0 0 1px var(--texto-suave);
+}
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
+.leyenda li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.leyenda i {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+}
+
+.leyenda i.hueco,
+.leyenda i.b-pendiente {
+  background: var(--superficie);
+  box-shadow: inset 0 0 0 1.5px var(--texto-suave);
+}
+
+.leyenda b {
+  color: var(--texto);
+  font-variant-numeric: tabular-nums;
+}
+
+.leyenda.chica {
+  font-size: 0.78rem;
+  margin: 0 0 10px;
+}
+
+.tarjeta-mapa .leyenda.chica {
+  margin: 10px 0 0;
+}
+
+/* --- Barras horizontales --------------------------------------------------------- */
+.hbars {
+  display: grid;
+  gap: 4px;
+}
+
+.hbar {
+  display: grid;
+  grid-template-columns: minmax(110px, 42%) minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 5px 6px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  font: inherit;
+  color: var(--texto);
+  text-align: left;
+  cursor: pointer;
+}
+
+.hbar:hover {
+  background: var(--fondo);
+}
+
+.hbar.estatico {
+  cursor: default;
+}
+
+.hb-l {
+  font-size: 0.84rem;
+  color: var(--texto-suave);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hbars .hb-l::first-letter {
+  text-transform: uppercase;
+}
+
+.hb-l small {
+  font-size: 0.74rem;
+}
+
+.hb-p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.hb-track {
+  display: flex;
+  gap: 2px;
+  height: 14px;
+  min-width: 3px;
+}
+
+.hb-track span {
+  height: 100%;
+}
+
+.hb-track span:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+.hb-p b {
+  font-size: 0.84rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.mini-barra {
+  flex: 1;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--fondo);
+  box-shadow: inset 0 0 0 1px var(--borde);
+  overflow: hidden;
+}
+
+.mini-barra div {
+  height: 100%;
+  border-radius: 0 5px 5px 0;
+}
+
+/* --- Mapa ------------------------------------------------------------------------- */
+#mapa {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+  height: 520px;
+  border-radius: 9px;
+  border: 1px solid var(--borde);
+  background: var(--fondo);
+}
+
+@media (max-width: 1000px) {
+  #mapa {
+    height: 380px;
+  }
+}
+
+.leaflet-container {
+  font-family: var(--fuente);
+}
+
+.leaflet-tooltip {
+  font-family: var(--fuente);
+  font-size: 0.82rem;
+}
+
+/* Argenmap gris es un mapa claro en escala de grises: en modo oscuro se
+   invierte para que no encandile y los puntos de clasificación resalten. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) .leaflet-tile-pane {
+    filter: invert(1) brightness(0.85) contrast(0.9);
+  }
+}
+
+:root[data-tema="oscuro"] .leaflet-tile-pane {
+  filter: invert(1) brightness(0.85) contrast(0.9);
+}
+
+/* --- Listas de prioridad ------------------------------------------------------- */
+.lista-esc {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.fila-esc {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  font: inherit;
+  color: var(--texto);
+  text-align: left;
+  cursor: pointer;
+}
+
+.fila-esc:hover {
+  background: var(--fondo);
+}
+
+.fe-n {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+
+.fe-n strong {
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fe-n small {
+  color: var(--texto-suave);
+  font-size: 0.78rem;
+}
+
+.fe-ks {
+  max-width: 40%;
+  font-size: 0.78rem;
+  text-align: right;
+  font-weight: 600;
+}
+
+.fe-ks.texto-ks {
+  display: block;
+}
+
+.numero-ies.c-roja {
+  background: var(--ies-roja);
+  box-shadow: none;
+  color: var(--ies-roja-texto);
+}
+
+/* --- Tablas (sobre la tabla de base.css) --------------------------------------- */
+.tabla-scroll {
+  margin: 0 -16px;
+  padding: 0 16px;
+}
+
+.tabla {
+  min-width: 900px;
+  font-size: 0.87rem;
+}
+
+.tabla th {
+  position: sticky;
+  top: 0;
+  background: var(--superficie);
+}
+
+.tabla th button {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+
+.tabla th button.activo {
+  color: var(--texto);
+}
+
+.tabla td {
+  vertical-align: top;
+  white-space: normal;
+}
+
+.tabla td small {
+  display: block;
+  color: var(--texto-suave);
+  font-size: 0.76rem;
+}
+
+.tabla tbody tr[data-cue] {
+  cursor: pointer;
+}
+
+.tabla tbody tr:hover {
+  background: var(--fondo);
+}
+
+.tabla .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabla td.num small {
+  display: inline;
+  margin-left: 4px;
+}
+
+.niv {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.niv span {
+  padding: 1px 7px;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--marca) 14%, transparent);
+  color: var(--texto);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.fila-ks {
+  box-shadow: inset 4px 0 0 var(--ies-roja);
+}
+
+.jur {
+  white-space: nowrap;
+  font-size: 0.84rem;
+}
+
+.g-sel {
+  min-height: 34px;
+  font-size: 0.84rem;
+  padding: 0 8px;
+}
+
+/* --- Plan de intervención ---------------------------------------------------- */
+.resumen-gestion {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 900px) {
+  .resumen-gestion {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.rg {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  font: inherit;
+  color: var(--texto);
+  text-align: left;
+  cursor: pointer;
+}
+
+.rg b {
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.rg span {
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+}
+
+.rg.activo {
+  border-color: var(--marca);
+  background: color-mix(in srgb, var(--marca) 10%, var(--superficie));
+  box-shadow: inset 0 0 0 1px var(--marca);
+}
+
+.cab-filtros {
+  flex-direction: row !important;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 10px !important;
+}
+
+.filtros-inc {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.chk {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.86rem;
+  color: var(--texto-suave);
+}
+
+/* --- Ficha lateral de la institución ----------------------------------------- */
+.ficha {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  width: min(560px, 100vw);
+  padding: 18px 22px 40px;
+  overflow-y: auto;
+  background: var(--superficie);
+  border-left: 1px solid var(--borde);
+  box-shadow: var(--sombra-flotante);
+  transform: translateX(105%);
+  visibility: hidden;
+  transition: transform 0.22s ease, visibility 0s linear 0.22s;
+}
+
+.ficha.abierta {
+  transform: none;
+  visibility: visible;
+  transition: transform 0.22s ease;
+}
+
+.velo {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.velo.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ficha .btn-ico {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--texto);
+  cursor: pointer;
+}
+
+.ficha .btn-ico:hover {
+  background: var(--fondo);
+}
+
+.ficha-cab {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.ficha-cab h2 {
+  margin: 2px 0 4px;
+  font-size: 1.25rem;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.ficha-cab small {
+  color: var(--texto-suave);
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+
+.ficha-cab p {
+  margin: 0 0 8px;
+  color: var(--texto-suave);
+  font-size: 0.88rem;
+}
+
+.ficha section {
+  margin-top: 18px;
+}
+
+.ficha h3 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+}
+
+.ficha-ies {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: var(--radio);
+  background: var(--fondo);
+  border-left: 6px solid var(--c, var(--texto-suave));
+}
+
+.ficha-ies > div:first-child > span {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+.ficha-ies b {
+  font-size: 2.8rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.ficha-ies > div:first-child > small {
+  color: var(--texto-suave);
+  font-weight: 600;
+}
+
+.ficha-ies .etiqueta-clase {
+  margin-bottom: 2px;
+}
+
+.ficha-ies p {
+  margin: 6px 0 0;
+  font-size: 0.84rem;
+  color: var(--texto-suave);
+}
+
+.ficha-ies .aviso {
+  color: var(--texto);
+  font-weight: 600;
+}
+
+.ficha-ks {
+  padding: 12px 14px;
+  border-radius: var(--radio);
+}
+
+.ficha-ks ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.88rem;
+}
+
+.ficha-vacia {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: var(--radio);
+  background: var(--fondo);
+}
+
+.historial {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.historial li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.84rem;
+}
+
+.historial li span {
+  width: 86px;
+  color: var(--texto-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+.historial li b {
+  width: 28px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.ficha-inc {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.ficha-inc li {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--borde);
+  border-radius: 9px;
+}
+
+.ficha-inc p {
+  margin: 0;
+  font-size: 0.86rem;
+}
+
+.ficha-inc small {
+  color: var(--texto-suave);
+}
+
+.ficha-inc .g-sel {
+  justify-self: start;
+}
+
+/* --- Conexión ----------------------------------------------------------------------- */
+.conexion {
+  max-width: 560px;
+  margin: 8px 0;
+  display: grid;
+  gap: 8px;
+}
+
+.conexion label {
+  font-weight: 600;
+  font-size: 0.88rem;
+  margin-top: 8px;
+}
+
+.conexion .acciones {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.conexion .error {
+  margin: 4px 0;
+  padding: 8px 10px;
+  font-size: 0.88rem;
+}
+
+/* --- Tooltip --------------------------------------------------------------------- */
+.tip {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 80;
+  max-width: 320px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: var(--texto);
+  color: var(--fondo);
+  font-size: 0.8rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.tip.visible {
+  opacity: 1;
+}
+
+#toasts {
+  left: auto;
+  right: 16px;
+  justify-items: end;
+}
+
+.toast {
+  max-width: 380px;
+}
+
+@media (max-width: 700px) {
+  .tabs {
+    flex-wrap: wrap;
+  }
+
+  .herramientas-der {
+    margin-left: 0;
+  }
+
+  .kpi .valor {
+    font-size: 1.7rem;
+  }
+}
+
+/* ==========================================================================
+   Evidencias fotográficas (Google Drive)
+   ========================================================================== */
+
+/* Texto sólo para lectores de pantalla (etiquetas de campos sin título visible). */
+.oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.g-evid {
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+}
+
+@media (max-width: 1000px) {
+  .g-evid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.evid-lista input[type=search] {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.evid-lista .lista-esc {
+  max-height: 640px;
+  overflow-y: auto;
+}
+
+.fila-esc.activa {
+  background: color-mix(in srgb, var(--marca) 14%, var(--superficie));
+  box-shadow: inset 3px 0 0 var(--marca);
+}
+
+.evid-vacio {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.evid-vacio .icono {
+  color: var(--texto-suave);
+}
+
+.evid-cab {
+  flex-direction: row !important;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.evid-form {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.evid-campos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.evid-campos > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.evid-campos label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+.evid-campos select,
+.evid-campos input {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 12px;
+  font: inherit;
+  color: var(--texto);
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+}
+
+.evid-desc {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 700px) {
+  .evid-campos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.evid-zona {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 22px 16px;
+  text-align: center;
+  border: 2px dashed var(--borde);
+  border-radius: var(--radio);
+  background: var(--fondo);
+  cursor: pointer;
+}
+
+.evid-zona:hover,
+.evid-zona.arrastrando,
+.evid-zona:focus-within {
+  border-color: var(--marca);
+  background: color-mix(in srgb, var(--marca) 8%, var(--fondo));
+}
+
+.evid-zona .icono {
+  color: var(--marca-enlace);
+}
+
+/* El input queda accesible por teclado (Tab) pero oculto: la zona entera es su etiqueta. */
+.evid-zona input[type=file] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.evid-aviso {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 0.84rem;
+  color: var(--texto);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--alerta) 18%, var(--superficie));
+}
+
+.evid-aviso .icono {
+  font-size: 18px;
+}
+
+.evid-cola {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+  font-size: 0.84rem;
+}
+
+.evid-cola li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--fondo);
+  border-left: 4px solid var(--ies-curso);
+}
+
+.evid-cola li span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.evid-cola .ec-ok { border-left-color: var(--ok); }
+.evid-cola .ec-error { border-left-color: var(--grave); }
+
+.evid-grilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.evid-grilla.chica {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.evid-item {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  min-width: 0;
+}
+
+.evid-item figcaption {
+  display: grid;
+  gap: 2px;
+  font-size: 0.84rem;
+  min-width: 0;
+}
+
+.evid-item figcaption strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.evid-item figcaption small {
+  color: var(--texto-suave);
+}
+
+.evid-acc {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 0.82rem;
+}
+
+.evid-acc a {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--marca-enlace);
+  font-weight: 600;
+}
+
+.evid-acc .icono {
+  font-size: 16px;
+}
+
+.link-peligro {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.82rem;
+  color: var(--grave);
+}
+
+.evid-mini {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-width: 100%;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  background: var(--fondo);
+  cursor: zoom-in;
+}
+
+.evid-mini img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.evid-espera {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 2px;
+  height: 100%;
+  color: var(--texto-suave);
+  font-size: 0.78rem;
+}
+
+.ficha-evid .boton {
+  margin-top: 4px;
+}
+
+.evid-dialogo {
+  width: min(960px, 94vw);
+  max-height: 92vh;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radio);
+  background: var(--superficie);
+  color: var(--texto);
+  box-shadow: var(--sombra-flotante);
+}
+
+.evid-dialogo::backdrop {
+  background: color-mix(in srgb, var(--texto) 55%, transparent);
+}
+
+.ed-cab {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--borde);
+}
+
+.ed-cab small {
+  display: block;
+  color: var(--texto-suave);
+  font-size: 0.82rem;
+}
+
+.evid-dialogo img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(92vh - 70px);
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+.evid-dialogo .cargando {
+  min-height: 240px;
+}
+
+/* Observación del auditor (cargada en la PWA) junto al hallazgo. */
+.obs-aud {
+  display: flex;
+  gap: 5px;
+  align-items: flex-start;
+  margin-top: 4px;
+  color: var(--texto-suave);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.tabla td small.obs-aud {
+  display: flex;
+}
+
+.obs-aud .icono {
+  font-size: 15px;
+  font-style: normal;
+}
+
+/* --- Capa «Barrios» del mapa territorial ------------------------------------- */
+.cab-mapa {
+  flex-direction: row !important;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px !important;
+}
+
+.cab-mapa .chk {
+  flex: none;
+  min-height: 32px;
+  cursor: pointer;
+}
+
+.leyenda i.limite-barrio {
+  background: color-mix(in srgb, var(--marca) 6%, transparent);
+  box-shadow: inset 0 0 0 1.5px var(--texto-suave);
+}
+
+.leaflet-tooltip.tip-barrio {
+  font-weight: 600;
+}

@@ -1,0 +1,16 @@
+/* ==========================================================================
+   fuentes.css — Google Sans, la tipografía del equipo de estadísticas.
+
+   Un solo archivo variable (cubre los pesos 400 a 700), guardado en
+   assets/fonts/ — no se carga de internet. Si por algún motivo no cargara,
+   el navegador cae a la tipografía del sistema (ver --fuente en tokens.css).
+   No se toca.
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Google Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('../assets/fonts/google-sans-latin-variable.woff2') format('woff2');
+}

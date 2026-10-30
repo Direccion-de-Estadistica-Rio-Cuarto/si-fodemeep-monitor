@@ -1,0 +1,55 @@
+/* ==========================================================================
+   iconos.css — Material Symbols (Google Fonts), autoalojada.
+
+   Un solo archivo (assets/fonts/material-symbols-outlined.woff2) cubre TODOS
+   los íconos de https://fonts.google.com/icons — no se carga de internet.
+   No se toca.
+
+   USO:
+
+     <span class="icono" aria-hidden="true">home</span>
+
+   El texto adentro es el NOMBRE del ícono (en inglés, con guion bajo si
+   tiene más de una palabra — ej. "arrow_back"). Buscá el ícono que querés en
+   fonts.google.com/icons y copiá el nombre que figura debajo.
+
+   ACCESIBILIDAD — uno de los dos, siempre:
+   - Ícono al lado de un texto visible (ej. un botón "Descargar" con un
+     ícono de descarga): el ícono es decorativo, va con `aria-hidden="true"`
+     como en el ejemplo de arriba.
+   - Ícono SOLO, sin texto visible (ej. un botón que es solo una lupa):
+     el ícono lleva igual `aria-hidden="true"`, pero el elemento que lo
+     contiene (el `<button>`, el `<a>`) necesita `aria-label="Buscar"` — si
+     no, un lector de pantalla no tiene forma de saber qué hace.
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;   /* mejor un parpadeo corto que un ícono "roto" (la letra suelta) */
+  src: url('../assets/fonts/material-symbols-outlined.woff2') format('woff2');
+}
+
+.icono {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  color: currentColor;   /* toma el color del texto que lo rodea */
+  vertical-align: middle;
+}
+
+/* Tamaños */
+.icono--chico  { font-size: 18px; }
+.icono--grande { font-size: 32px; }

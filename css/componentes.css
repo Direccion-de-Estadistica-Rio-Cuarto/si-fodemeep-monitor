@@ -1,0 +1,198 @@
+/* ==========================================================================
+   componentes.css — Piezas reutilizables del design system: botones, estados
+   y ayudas de tipografía. Usan las variables de tokens.css (no hay colores
+   propios acá). Miralas todas juntas en guia-diseno.html.
+   ========================================================================== */
+
+/* --- Tipografía ----------------------------------------------------------
+   La fuente y el cuerpo base ya se fijan en base.css (body). Acá va la escala
+   de títulos y un par de ayudas de texto, para que todos los tableros usen los
+   mismos tamaños. */
+
+.titulo-xl {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.titulo-l {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.titulo-m {
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.titulo-s {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.texto {
+  font-size: 1rem;
+  color: var(--texto);
+}
+
+.texto-suave {
+  color: var(--texto-suave);
+}
+
+.texto-chico {
+  font-size: 0.85rem;
+}
+
+.texto-numero {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Botones -------------------------------------------------------------
+   Base + variantes. En un tablero los botones se usan poco (filtros, "descargar
+   datos", "ver más"); estos alcanzan para eso. */
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font: inherit;
+  font-weight: 600;
+  line-height: 1;
+  padding: 10px 16px;
+  border-radius: var(--radio);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--texto);
+  cursor: pointer;
+  text-decoration: none;
+  transition: filter 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.boton:hover {
+  filter: brightness(0.96);
+}
+
+.boton:active {
+  filter: brightness(0.92);
+}
+
+.boton:focus-visible {
+  outline: 2px solid var(--marca);
+  outline-offset: 2px;
+}
+
+.boton[disabled],
+.boton.deshabilitado {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: none;
+}
+
+/* Primario: acción principal. Usa el color de marca. Texto oscuro fijo (no
+   blanco): a este tamaño de letra, el celeste no tiene contraste suficiente
+   para texto blanco — ver --texto-sobre-marca en tokens.css. */
+.boton--primario {
+  background: var(--marca);
+  color: var(--marca-texto);
+  border-color: var(--marca);
+}
+
+/* Secundario: acción alternativa, con borde. */
+.boton--secundario {
+  background: var(--superficie);
+  color: var(--texto);
+  border-color: var(--borde);
+}
+
+.boton--secundario:hover {
+  background: var(--fondo);
+}
+
+/* Sutil: para acciones terciarias, sin caja. --marca-enlace (no --marca): acá
+   el celeste ES el texto, y el oficial no tiene contraste suficiente para eso. */
+.boton--sutil {
+  background: transparent;
+  color: var(--marca-enlace);
+  border-color: transparent;
+}
+
+.boton--sutil:hover {
+  background: color-mix(in srgb, var(--marca) 12%, transparent);
+}
+
+/* Peligro: acciones destructivas (borrar, etc.). Usar con moderación. */
+.boton--peligro {
+  background: var(--grave);
+  color: #ffffff;
+  border-color: var(--grave);
+}
+
+/* Tamaños */
+.boton--chico {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.boton--grande {
+  padding: 13px 22px;
+  font-size: 1.05rem;
+}
+
+/* --- Etiquetas de estado (badges) ---------------------------------------- */
+
+/* El color del estado va en el FONDO (un tinte) y en el PUNTO — nunca en el
+   texto. Motivo: para que un amarillo pase contraste como texto hay que
+   oscurecerlo tanto que deja de verse amarillo, y un "alerta" marrón no se
+   reconoce de un vistazo. Con el texto en el neutro del tema, el color se
+   mantiene real y de paso el contraste sube a 12-16:1. Ver ACCESIBILIDAD.md. */
+
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  color: var(--texto);
+}
+
+/* El punto lleva --color-estado, que define cada variante de abajo. No usa
+   currentColor: tomaría el neutro del texto y la etiqueta perdería el color. */
+.estado::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-estado);
+}
+
+.estado--ok {
+  --color-estado: var(--ok);
+  background: color-mix(in srgb, var(--ok) 14%, transparent);
+}
+
+.estado--alerta {
+  --color-estado: var(--alerta);
+  background: color-mix(in srgb, var(--alerta) 14%, transparent);
+}
+
+.estado--grave {
+  --color-estado: var(--grave);
+  background: color-mix(in srgb, var(--grave) 14%, transparent);
+}
+
+.estado--neutro {
+  --color-estado: var(--texto-suave);
+  background: color-mix(in srgb, var(--texto-suave) 12%, transparent);
+}

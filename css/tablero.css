@@ -1,0 +1,343 @@
+/* ==========================================================================
+   tablero.css — Componentes propios del SI FoDeMEEP Río Cuarto.
+
+   Capa compartida por las dos páginas del sistema (la PWA de relevamiento,
+   index.html, y el Monitor Ejecutivo, monitor.html). Lo específico de cada
+   una va después: css/app.css (PWA) y monitor/monitor.css (Monitor).
+
+   Reglas de la plantilla que se respetan acá:
+   1. Los colores salen de css/tokens.css (sistema + tokens del dominio).
+   2. Los colores de estado/clasificación van al FONDO, al PUNTO o a la
+      BARRA, nunca al texto (ver ACCESIBILIDAD.md).
+   ========================================================================== */
+
+/* --- Ajustes de estructura ---------------------------------------------------
+   base.css usa overflow-x: hidden en html y body: eso convierte al body en un
+   contenedor de desplazamiento y anula position: sticky (barra del
+   relevamiento, buscador). overflow-x: clip evita el desborde lateral igual,
+   sin crear ese contenedor. */
+body {
+  overflow-x: clip;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* Header de la plantilla en pantallas angostas (celular en campo): el logo
+   se achica para que el nombre del organismo no ocupe cuatro renglones. El
+   h1 conserva tamaño y peso (texto grande para WCAG — ver base.css). */
+@media (max-width: 520px) {
+  .encabezado {
+    padding: 12px 0;
+  }
+
+  .encabezado .contenedor {
+    gap: 12px;
+  }
+
+  .encabezado .logo {
+    height: 34px;
+  }
+
+  .encabezado .titulos p {
+    display: none;
+  }
+}
+
+/* Botón que ocupa todo el ancho (acciones principales en el celular). */
+.boton--ancho {
+  width: 100%;
+}
+
+.boton .icono {
+  font-size: 20px;
+}
+
+.boton--chico .icono {
+  font-size: 18px;
+}
+
+/* Íconos que giran mientras algo carga. */
+.girando .icono,
+.icono.girando {
+  animation: girar 1s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Contador redondo junto a un título (ej. «Incidencias 12»). */
+.cuenta {
+  display: inline-grid;
+  place-items: center;
+  min-width: 26px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--marca) 14%, transparent);
+  color: var(--texto);
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Clasificación del IES y estados del padrón ------------------------------
+   Cada clase fija --c; los componentes la usan para el fondo, el punto o la
+   barra. Mismas claves que el motor del IES y el Monitor. */
+.c-optimo, .e-optimo, .b-optimo, .p-optimo { --c: var(--ies-optimo); }
+.c-bueno, .e-bueno, .b-bueno, .p-bueno { --c: var(--ies-bueno); }
+.c-regular, .e-regular, .b-regular, .p-regular { --c: var(--ies-regular); }
+.c-malo, .e-malo, .b-malo, .p-malo { --c: var(--ies-malo); }
+.c-critico, .e-critico, .b-critico, .p-critico { --c: var(--ies-critico); }
+.c-roja, .e-roja, .b-roja, .p-roja { --c: var(--ies-roja); }
+.c-curso, .e-curso, .b-curso, .p-curso { --c: var(--ies-curso); }
+.c-pendiente, .e-pendiente, .b-pendiente, .p-pendiente { --c: var(--ies-pendiente); }
+.c-vacio, .e-vacio, .b-vacio { --c: var(--texto-suave); }
+.b-relevada { --c: var(--marca); }
+.b-serie, .serie { --c: var(--serie-1); }
+.d-fodemeep { --c: var(--jur-fodemeep); }
+.d-provincia { --c: var(--jur-provincia); }
+
+/* Rellenos (barras, segmentos, leyendas). */
+.b-optimo, .b-bueno, .b-regular, .b-malo, .b-critico, .b-roja, .b-curso,
+.b-pendiente, .b-relevada, .b-serie, .serie, .d-fodemeep, .d-provincia {
+  background: var(--c);
+}
+
+.b-vacio {
+  background: transparent;
+}
+
+/* Etiqueta de clasificación: misma lógica que .estado (tinte + punto, texto
+   neutro). Se usa con cualquiera de las clases de arriba. */
+.etiqueta-clase {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--c, var(--texto-suave)) 16%, transparent);
+  color: var(--texto);
+  font-size: 0.76rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.etiqueta-clase::before {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c, var(--texto-suave));
+}
+
+.etiqueta-clase .icono {
+  font-size: 15px;
+  margin: -2px 0;
+}
+
+/* Pendiente: punto hueco, para distinguirla sin depender del tono. */
+.etiqueta-clase.p-pendiente::before,
+.etiqueta-clase.e-pendiente::before {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--texto-suave);
+}
+
+/* Número del IES dentro de una caja (listas, tarjetas, encabezados). */
+.numero-ies {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  min-width: 42px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--c, var(--texto-suave)) 18%, var(--superficie));
+  box-shadow: inset 3px 0 0 var(--c, var(--texto-suave));
+  color: var(--texto);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Alerta Roja (Kill-Switch) -----------------------------------------------
+   Único caso con color lleno y texto blanco: es la señal de máxima prioridad
+   y tiene que reconocerse de un vistazo. --ies-roja pasa 4.5:1 con blanco
+   en los dos temas. */
+.alerta-roja {
+  background: var(--ies-roja);
+  color: var(--ies-roja-texto);
+}
+
+.alerta-roja a {
+  color: inherit;
+}
+
+.marca-ks {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 8px;
+  border-radius: 6px;
+  background: var(--ies-roja);
+  color: var(--ies-roja-texto);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.marca-ks .icono {
+  font-size: 15px;
+}
+
+/* Texto que acompaña a un Kill-Switch fuera de un bloque rojo: el color va
+   en el ícono, el texto queda neutro y en negrita. */
+.texto-ks {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+.texto-ks .icono {
+  color: var(--ies-critico);
+  font-size: 18px;
+}
+
+/* --- Criticidad de la incidencia (BAJA · MEDIA · ALTA · CRÍTICA) ------------- */
+.crit-BAJA, .c-BAJA { --c: var(--texto-suave); }
+.crit-MEDIA, .c-MEDIA { --c: var(--alerta); }
+.crit-ALTA, .c-ALTA { --c: var(--ies-malo); }
+.crit-CRITICA, .c-CRITICA { --c: var(--grave); }
+
+.inc,
+.crit {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--c) 16%, transparent);
+  box-shadow: inset 3px 0 0 var(--c);
+  color: var(--texto);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+/* Punto de jurisdicción (FoDeMEEP / Provincia). */
+.dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: 0;
+}
+
+/* --- Avisos emergentes (toasts) ----------------------------------------------
+   Invierten el tema: fondo --texto y letra --fondo, contraste máximo en
+   claro y en oscuro. El tipo se marca con un borde de color. */
+#toasts {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: 90;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  pointer-events: none;
+}
+
+.toast {
+  width: 100%;
+  max-width: 520px;
+  padding: 12px 16px;
+  border-radius: var(--radio);
+  border-left: 5px solid var(--marca);
+  background: var(--texto);
+  color: var(--fondo);
+  font-size: 0.92rem;
+  box-shadow: var(--sombra-flotante);
+  transition: opacity 0.35s, transform 0.35s;
+}
+
+.toast .icono {
+  font-size: 20px;
+}
+
+.toast-ok, .t-ok { border-left-color: var(--ies-optimo); }
+.toast-error, .t-error { border-left-color: var(--grave); }
+
+.toast-roja {
+  border-left-color: var(--ies-roja-texto);
+  background: var(--ies-roja);
+  color: var(--ies-roja-texto);
+}
+
+.toast.salir {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .toast {
+    animation: entrar 0.25s ease-out;
+  }
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* --- Formularios ------------------------------------------------------------
+   La plantilla no trae campos de formulario: estos siguen sus tokens. */
+input[type=text], input[type=email], input[type=tel], input[type=url],
+input[type=password], input[type=number], input[type=search], textarea, select {
+  font: inherit;
+  color: var(--texto);
+  background: var(--superficie);
+  border: 1.5px solid var(--borde);
+  border-radius: var(--radio);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--texto-suave);
+  opacity: 1;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--marca);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--marca) 25%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--marca);
+  outline-offset: 2px;
+}
+
+code {
+  font-size: 0.85em;
+  background: var(--fondo);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* Sin animaciones para quien las desactivó en el sistema. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
