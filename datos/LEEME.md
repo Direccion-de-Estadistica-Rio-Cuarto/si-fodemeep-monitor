@@ -22,3 +22,15 @@ ogr2ogr -f GeoJSON -t_srs EPSG:4326 -lco RFC7946=YES -lco COORDINATE_PRECISION=6
 2. **Definir el barrio de cada escuela.** Regla del sistema: el barrio es siempre el del polígono donde caen las coordenadas de la escuela, aunque el padrón o la planilla digan otro (`js/barrios.js`, compartido por la PWA y el Monitor). Si una escuela tiene varios puntos, se listan sus barrios separados por « | ». Si cae fuera de todos los polígonos, queda «Sin barrio asignado». Si no tiene coordenadas, se conserva el barrio del padrón.
 
 El Service Worker la precarga para que la PWA asigne barrios sin conexión, y la pide primero a la red, así siempre se usa la versión publicada. Si se regenera esta capa, hay que regenerar también el barrio de `js/padron-inicial.js` y `apps-script/PadronInicial.gs` y ejecutar `cargarPadronInicial` en Apps Script, para que la hoja «Instituciones» quede igual.
+
+## relevamientos-campo.json
+
+- **Qué es:** relevamientos de campo exportados desde la PWA (botón «Exportar JSON») que todavía no llegaron a la planilla central. El Monitor los suma a los datos de la planilla (`sumarRelevamientosCampo` en `monitor/monitor.js`). Si la planilla ya trae el mismo `id_relevamiento`, gana la planilla; en la vista de ejemplo, el relevamiento real reemplaza al simulado de esa institución.
+- **Formato:** `relevamientos`, `incidencias` y `respuestas` con las mismas columnas que las hojas «Relevamientos», «Incidencias» y «Respuestas» (ver `apps-script/Codigo.gs`). Agrega `estado_relevamiento` (`finalizado` / `borrador`) y `observaciones_generales`.
+- **Cálculo:** IES, dimensiones e incidencias recalculados con `js/motor-ies.js` (catálogo 2026.10-v4) y comparados con el resultado del archivo de la PWA.
+- **Datos personales:** se omite el nombre del técnico (`tecnico` vacío y sin la respuesta #3). El resto describe el edificio, no personas.
+- **Contenido actual (20/11/2026, Pueblo Alberdi):**
+  - Escuela Mariano Moreno (CUE 1400916): IES 41, Alerta Roja (2 Kill-Switch), 16 incidencias. **Borrador** al 99 %.
+  - I.P.E.T. Nº 26 Juan Filloy (CUE 1404474): IES 71, Bueno, 15 incidencias. Finalizado; no se sincronizó con la planilla («Failed to fetch»).
+- **Para subirlos a la planilla desde el Monitor:** «Editar respuestas» en la ficha, completar el técnico (#3) y guardar. El relevamiento entero se envía a la planilla y desde ahí gana la versión de la planilla.
+- **Cuando se sincronicen con la planilla,** sacar esas filas de este archivo (o borrarlo): la gestión de incidencias que se cambie desde el Monitor sólo se guarda para relevamientos que están en la planilla.

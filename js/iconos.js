@@ -43,6 +43,11 @@ const NOMBRES = {
   Upload: 'upload',
   OpenInNew: 'open_in_new',
   Folder: 'folder',
+  Pencil: 'edit',
+  Save: 'save',
+  Info: 'info',
+  ArrowRight: 'arrow_forward',
+  LoaderCircle: 'progress_activity',
 };
 
 const CLASES = { grande: 'icono--grande', chico: 'icono--chico' };

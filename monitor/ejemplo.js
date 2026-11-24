@@ -9,6 +9,7 @@
 import { PREGUNTAS } from '../js/catalogo.js';
 import { calcularIES } from '../js/motor-ies.js';
 import { PADRON_INICIAL } from '../js/padron-inicial.js';
+import { textoRespuesta } from './editor.js';
 
 /** Generador pseudoaleatorio con semilla (resultados estables entre recargas). */
 function azar(semilla) {
@@ -54,7 +55,7 @@ function fechaDDMM(d) { return d.toLocaleDateString('es-AR', { day: '2-digit', m
 export function generarDatosEjemplo() {
   const rnd = azar(20261028);
   const hoy = new Date();
-  const relevamientos = [], incidencias = [], instituciones = [];
+  const relevamientos = [], incidencias = [], instituciones = [], respuestas = [];
 
   for (const inst of PADRON_INICIAL) {
     const u = rnd();
@@ -71,6 +72,13 @@ export function generarDatosEjemplo() {
       const res = calcularIES(resp);
       const id = `EJ-${inst.cue}-${k + 1}`;
       const tecnico = TECNICOS[Math.floor(rnd() * TECNICOS.length)];
+      Object.assign(resp, { 1: `${inst.nombre} - CUE: ${inst.cue}`, 3: tecnico, 4: fechaDDMM(fecha) });
+      // Hoja «Respuestas» (formato largo): la usa el editor de respuestas del Monitor.
+      for (const [idTxt, valor] of Object.entries(resp)) {
+        const p = PREGUNTAS.get(Number(idTxt)); if (!p) continue;
+        respuestas.push({ id_relevamiento: id, cue_base: inst.cue, id_pregunta: p.id, seccion: p.seccion, tipo: p.tipo, pregunta: p.texto,
+          valor: Array.isArray(valor) ? valor.join('|') : valor, texto_respuesta: textoRespuesta(p, valor), observacion: '' });
+      }
       const dims = Object.fromEntries(res.dimensiones.map(d => [d.id, d.completa ? d.puntaje : 'Incompleta']));
       relevamientos.push({
         id_relevamiento: id, cue_base: inst.cue, establecimiento: inst.nombre, sede_relevada: inst.direcciones[0] || '', barrio: inst.barrio,
@@ -101,5 +109,5 @@ export function generarDatosEjemplo() {
     }
     instituciones.push({ ...inst, estadoServidor });
   }
-  return { ok: true, ejemplo: true, generado: hoy.toISOString(), planilla: 'Datos de ejemplo', puedeEditar: true, instituciones, relevamientos, incidencias, evidencias: [] };
+  return { ok: true, ejemplo: true, generado: hoy.toISOString(), planilla: 'Datos de ejemplo', puedeEditar: true, instituciones, relevamientos, incidencias, respuestas, evidencias: [] };
 }

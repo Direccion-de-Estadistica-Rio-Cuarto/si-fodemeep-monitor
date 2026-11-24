@@ -10,6 +10,7 @@
 import { icono } from '../js/iconos.js';
 import { DIMENSIONES, SECCIONES } from '../js/catalogo.js';
 import { generarDatosEjemplo } from './ejemplo.js';
+import { abrirEditor, filasDesdePaquete } from './editor.js';
 import { cargarBarrios, asignarBarrios, listaBarrios, estaEnBarrio } from '../js/barrios.js';
 
 const URL_PREDETERMINADA = 'https://script.google.com/macros/s/AKfycbxxL7HoQ5SesZ1RhalhHOz2o7-ShuaCBNu2tF4JFnfhnmN97Hdyp7nrg5tCrmEgGZBS/exec';
@@ -67,12 +68,42 @@ async function cargar() {
       if (!j.ok) throw new Error(j.error || 'La planilla rechazó la consulta.');
       st.datos = j;
     }
+    st.datos = await sumarRelevamientosCampo(st.datos);
     st.geoBarrios = await cargarBarrios(); // barrio oficial = polígono donde cae cada escuela
     st.m = construirModelo(st.datos);
   } catch (e) {
     st.error = e.message.includes('Failed to fetch') ? 'No se pudo conectar con la planilla. Verifique la conexión a internet y la URL.' : e.message;
   }
   st.cargando = false; pintar();
+}
+
+/**
+ * Relevamientos de campo que llegaron como archivo exportado por la PWA y todavía no están en la
+ * planilla (datos/relevamientos-campo.json, mismo formato que las hojas Relevamientos e Incidencias).
+ * Si la planilla ya trae el mismo id_relevamiento, gana la planilla. En la vista de ejemplo, el
+ * relevamiento real reemplaza al simulado de esa institución.
+ */
+async function sumarRelevamientosCampo(d) {
+  let campo;
+  try {
+    const r = await fetch('datos/relevamientos-campo.json', { cache: 'no-cache' });
+    if (!r.ok) return d;
+    campo = await r.json();
+  } catch { return d; }
+  const ids = new Set((d.relevamientos || []).map(r => r.id_relevamiento));
+  const nuevos = (campo.relevamientos || []).filter(r => !ids.has(r.id_relevamiento));
+  if (!nuevos.length) return d;
+  const idsNuevos = new Set(nuevos.map(r => r.id_relevamiento));
+  const cuesNuevos = new Set(nuevos.map(r => String(r.cue_base)));
+  const quitar = r => d.ejemplo && cuesNuevos.has(String(r.cue_base));
+  const deCampo = l => (l || []).filter(x => idsNuevos.has(x.id_relevamiento));
+  return {
+    ...d,
+    relevamientos: (d.relevamientos || []).filter(r => !quitar(r)).concat(nuevos.map(r => ({ ...r, origen: 'archivo' }))),
+    incidencias: (d.incidencias || []).filter(x => !quitar(x)).concat(deCampo(campo.incidencias)),
+    respuestas: (d.respuestas || []).filter(x => !quitar(x)).concat(deCampo(campo.respuestas)),
+    campo: nuevos.length
+  };
 }
 
 function construirModelo(d) {
@@ -247,7 +278,7 @@ function vistaInstituciones() {
         <td class="num">${e.ies ?? '—'}</td>
         <td class="num">${e.ks ? `<span class="texto-ks">${icono('Siren')} ${e.ks}</span>` : '—'}</td>
         <td class="num">${e.ultimo ? `${e.abiertas.length} <small>${e.abiertas.filter(x => x.jurisdiccion === 'FoDeMEEP').length} F · ${e.abiertas.filter(x => x.jurisdiccion !== 'FoDeMEEP').length} P</small>` : '—'}</td>
-        <td>${e.ultimo ? `${fecha(e.ultimo.fecha_finalizacion)}<small>${esc(e.ultimo.tecnico || '')}</small>` : e.clase === 'curso' ? `<small>${esc(e.estadoServidor?.tecnico || 'En curso')}</small>` : '—'}</td>
+        <td>${e.ultimo ? `${fecha(e.ultimo.fecha_finalizacion)}<small>${esc(e.ultimo.tecnico || (e.ultimo.estado_relevamiento === 'borrador' ? 'Borrador sin finalizar' : ''))}</small>` : e.clase === 'curso' ? `<small>${esc(e.estadoServidor?.tecnico || 'En curso')}</small>` : '—'}</td>
       </tr>`).join('')}</tbody></table></div></article>`;
 }
 
@@ -312,10 +343,12 @@ function ficha(e) {
     ${!u ? `<div class="ficha-vacia">${pill(e.clase)}<p>${e.clase === 'curso' ? `Relevamiento en curso${e.estadoServidor?.tecnico ? ` por ${esc(e.estadoServidor.tecnico)}` : ''}.` : 'Todavía no fue relevada.'}</p></div>` : `
     <section class="ficha-ies c-${e.clase}">
       <div><span>IES</span><b>${u.ies}</b><small>/ 100</small></div>
-      <div>${pill(e.clase)}<p>${fecha(u.fecha_finalizacion)} · ${esc(u.tecnico || '')}</p>
+      <div>${pill(e.clase)}<p>${fecha(u.fecha_finalizacion)} · ${esc(u.tecnico || (u.estado_relevamiento === 'borrador' ? 'Borrador sin finalizar' : ''))}</p>
         ${e.ks ? `<p>Puntaje base ${fmt(u.ies_base)} × multiplicador ${Number(u.multiplicador_kill_switch).toLocaleString('es-AR', { maximumFractionDigits: 4 })}</p>` : ''}
         ${Number(u.dimensiones_completas) < 7 ? `<p class="aviso">${u.dimensiones_completas} de 7 dimensiones completas</p>` : ''}</div>
     </section>
+    ${st.datos.puedeEditar ? `<div class="ficha-editar"><button class="boton boton--secundario boton--chico" data-editar="${e.cue}">${icono('Pencil')} Editar respuestas</button>
+      <small>Corrige el último relevamiento y recalcula el IES. Queda registro de cada cambio.</small></div>` : ''}
     ${e.ks ? `<section class="ficha-ks alerta-roja"><h3>${icono('Siren')} Kill-Switch activos</h3><ul>${String(u.motivos_kill_switch).split(' | ').map(m => `<li>${esc(m)}</li>`).join('')}</ul></section>` : ''}
     <section><h3>Subíndices</h3><div class="hbars">${DIMENSIONES.map(d => { const v = u[COL_DIM[d.id]]; const ok = v !== 'Incompleta' && v !== '' && v != null;
       return `<div class="hbar estatico"><span class="hb-l">${esc(d.nombre)} <small>${d.peso}%</small></span><span class="hb-p"><span class="hb-track" style="width:${ok ? v : 0}%"><span class="serie" style="flex:1"></span></span><b>${ok ? v : 'Incompleta'}</b></span></div>`; }).join('')}</div></section>
@@ -568,6 +601,7 @@ function actualizarIntro() {
   el.textContent = st.datos.ejemplo
     ? `Datos de ejemplo generados el ${hora} · último relevamiento de cada institución.`
     : `Datos de «${st.datos.planilla || 'planilla central'}» al ${hora} · último relevamiento de cada institución.`;
+  if (st.datos.campo) el.textContent += ` Incluye ${st.datos.campo} relevamiento${st.datos.campo > 1 ? 's' : ''} de campo cargado${st.datos.campo > 1 ? 's' : ''} desde archivo (aún no en la planilla).`;
 }
 
 function dibujarMapa() {
@@ -699,6 +733,55 @@ async function cambiarGestion(sel) {
   if (st.seleccion) { pintarFicha(); $('#ficha').scrollTop = scroll; }
 }
 
+/* ================= Edición de respuestas (monitor/editor.js) ================= */
+
+/** Filas de la hoja Respuestas del relevamiento: las que ya vinieron con los datos o, si no, se piden a la planilla. */
+async function respuestasDe(rel) {
+  const locales = (st.datos.respuestas || []).filter(x => x.id_relevamiento === rel.id_relevamiento);
+  if (locales.length || st.datos.ejemplo || rel.origen === 'archivo') return locales;
+  const r = await fetch(`${st.config.url}?accion=respuestas&id=${encodeURIComponent(rel.id_relevamiento)}&token=${encodeURIComponent(st.config.token)}`);
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.error === 'Acción no reconocida.' ? 'La aplicación de Apps Script no tiene la edición de respuestas: publique la versión nueva de Codigo.gs.' : j.error);
+  return j.respuestas || [];
+}
+
+async function editarRespuestas(cue, boton) {
+  const e = st.m.porCue.get(cue), rel = e?.ultimo;
+  if (!rel) return;
+  boton.disabled = true;
+  let filas;
+  try { filas = await respuestasDe(rel); }
+  catch (err) { aviso(`No se pudieron leer las respuestas: ${err.message}`, 'error'); return; }
+  finally { boton.disabled = false; }
+  if (!filas.length) { aviso('Este relevamiento no tiene respuestas guardadas para editar.', 'error'); return; }
+  const nota = st.datos.ejemplo ? 'Vista de ejemplo: los cambios quedan sólo en esta pantalla.'
+    : rel.origen === 'archivo' ? 'Este relevamiento todavía no está en la planilla: al guardar se sube completo. Complete el técnico responsable (#3), que no se publica en el archivo.'
+      : '';
+  abrirEditor({
+    rel, escuela: e, filas, nota, seccion: rel.origen === 'archivo' ? 1 : undefined,
+    guardar: async envio => {
+      if (!st.datos.ejemplo) {
+        const r = await fetch(st.config.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ token: st.config.token, accion: 'editarRelevamiento', versionCatalogo: envio.paquete.versionCatalogo,
+            relevamiento: envio.paquete.relevamiento, cambios: envio.cambios, responsable: envio.responsable, motivo: envio.motivo, iesAnterior: envio.iesAnterior }) });
+        const j = await r.json();
+        if (!j.ok) throw new Error(j.error === 'Acción no reconocida.' ? 'publique la versión nueva de Codigo.gs en Apps Script.' : j.error);
+      }
+      const id = rel.id_relevamiento;
+      const f = filasDesdePaquete(envio.paquete, rel, st.datos.incidencias.filter(x => x.id_relevamiento === id));
+      st.datos = {
+        ...st.datos,
+        relevamientos: st.datos.relevamientos.map(r => r.id_relevamiento === id ? { ...f.relevamiento, origen: undefined } : r),
+        incidencias: st.datos.incidencias.filter(x => x.id_relevamiento !== id).concat(f.incidencias),
+        respuestas: (st.datos.respuestas || []).filter(x => x.id_relevamiento !== id).concat(f.respuestas)
+      };
+      st.m = construirModelo(st.datos);
+      pintar();
+      aviso(`Respuestas actualizadas en ${e.nombre}: IES ${envio.iesAnterior} → ${f.relevamiento.ies}.${st.datos.ejemplo ? ' (Sólo en esta vista de ejemplo.)' : ''}`, 'ok');
+    }
+  });
+}
+
 document.addEventListener('click', ev => {
   const t = ev.target.closest('button, tr[data-cue]'); if (!t) { if (ev.target.id === 'velo') cerrarFicha(); return; }
   if (t.id === 'cerrar-ficha') return cerrarFicha();
@@ -707,6 +790,7 @@ document.addEventListener('click', ev => {
   if (t.dataset.quitarEvid) return quitarEvidencia(t);
   if (t.dataset.evidCue) { if (st.evid.cue !== t.dataset.evidCue) st.evid = { ...st.evid, cue: t.dataset.evidCue, rel: '', preg: '', desc: '' }; return pintar(); }
   if (t.dataset.irEvid) { st.evid = { ...st.evid, cue: t.dataset.irEvid, rel: '', preg: '', desc: '' }; cerrarFicha(); if (location.hash === '#evidencias') pintar(); else location.hash = 'evidencias'; return; }
+  if (t.dataset.editar) return editarRespuestas(t.dataset.editar, t);
   if (t.dataset.cue) return abrirFicha(t.dataset.cue);
   if (t.dataset.orden) { st.orden = { col: t.dataset.orden, dir: st.orden.col === t.dataset.orden ? -st.orden.dir : 1 }; return pintar(); }
   if (t.dataset.rubro) { st.inc = { ...st.inc, rubro: t.dataset.rubro, gestion: 'abiertas' }; location.hash = 'incidencias'; return; }
@@ -724,7 +808,7 @@ document.addEventListener('click', ev => {
   }
 });
 document.addEventListener('keydown', ev => {
-  if (ev.key === 'Escape' && st.seleccion) cerrarFicha();
+  if (ev.key === 'Escape' && st.seleccion && !$('#editor-dialogo')?.open) cerrarFicha();
   if (ev.key === 'Enter' && ev.target.matches('tr[data-cue]')) abrirFicha(ev.target.dataset.cue);
 });
 window.addEventListener('hashchange', () => { pintar(); });
